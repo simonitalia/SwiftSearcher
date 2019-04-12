@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreSpotlight
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -40,7 +41,24 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(_ application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
-
-
+    
+    func application(_ application: UIApplication, continue userActivity: NSUserActivity, restorationHandler: @escaping ([UIUserActivityRestoring]?) -> Void) -> Bool {
+        
+        //If app launch is triggered by user from a Spotlight search
+        if userActivity.activityType == CSSearchableItemActionType {
+            if let uniqueIdentifier = userActivity.userInfo?[CSSearchableItemActivityIdentifier] as? String {
+                
+                //Conditionally typecast window's root controller as navigationController
+                if let navigationController = window?.rootViewController as? UINavigationController {
+                    
+                    //Conditionally typecast topViewController as viewController
+                    if let viewController = navigationController.topViewController as? ViewController {
+                        viewController.showTutorial(Int(uniqueIdentifier)!)
+                    }
+                }
+            }
+        }
+        
+        return true
+    }
 }
-
