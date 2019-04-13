@@ -11,10 +11,18 @@ import SafariServices
 import CoreSpotlight
 import MobileCoreServices
 
-class ViewController: UITableViewController {
+class ViewController: UITableViewController, TutorialDataProtocol {
     
-    //Property to store tutorial project titles and subtitles
-    var tutorials = [[String]]()
+    //Property to instantiate TutorialDataDelegate object
+    var delegate = TutorialDataDelegate()
+    
+    //Property array to store Tutorial arrays ([titles, subtitles])
+    var tutorials = [[Tutorial]]()
+    
+    //Delegate method to set fetched Tutorials JSONData to VC tutorials property
+    func fetchedTutorials(jsonData: [[Tutorial]]) {
+        tutorials = jsonData
+    }
     
     //Property to track tutorials favorited by user
     var favorites = [Int]()
@@ -22,22 +30,12 @@ class ViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+
+        //Set ViewController to TutorialDataDelegate object
+        delegate.delegate = self
         
-        tutorials.append(["Project 1: Storm Viewer, Constants and Variables", "UITableView, UIImageView, FileManager, storyboards"])
-        
-        tutorials.append(["Project 2: Guess the Flag", "@2x and @3x images, asset catalogs, integers, doubles, floats, operators (+= and -=), UIButton, enums, CALayer, UIColor, random numbers, actions, string interpolation, UIAlertController"])
-        
-        tutorials.append(["Project 3: Social Media", "UIBarButtonItem, UIActivityViewController, the Social framework, URL"])
-        
-        tutorials.append(["Project 4: Easy Browser", "loadView(), WKWebView, delegation, classes and structs, URLRequest, UIToolbar, UIProgressView., key-value observing"])
-        
-        tutorials.append(["Project 5: Word Scramble", "Closures, method return values, booleans, NSRange"])
-        
-        tutorials.append(["Project 6: Auto Layout", "Get to grips with Auto Layout using practical examples and code"])
-        
-        tutorials.append(["Project 7: Whitehouse Petitions", "JSON, Data, UITabBarController"])
-        
-        tutorials.append(["Project 8: 7 Swifty Words", "addTarget(), enumerated(), count, index(of:), property observers, range operators."])
+        //Fetch local Tutorial JSON Data file
+        delegate.getLocalJSONFile()
         
         print(tutorials)
         
@@ -68,14 +66,11 @@ class ViewController: UITableViewController {
         //Create cell
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         
-        //Pull out each project tutorial object from the array
+        //Pull out each Tutorial object array from the tutorials array
         let tutorial = tutorials[indexPath.row]
-        
-        //Assign each project tutorial object's name (at index 0) and subtitle (at index 1) to the cell / row text.
-//        cell.textLabel?.text = "\(tutorial[0]): \(tutorial[1])"
-        
+
         //Set attributed settings to cell text by calling our makeAttributedString method and passing in the text strings
-        cell.textLabel?.attributedText = makeAttributedString(title: tutorial[0], subtitle: tutorial[1])
+        cell.textLabel?.attributedText = makeAttributedString(title: tutorial[0].title, subtitle: tutorial[0].subtitle)
         
         //If user has favorited a tutorial, show a checkmark
         if favorites.contains(indexPath.row) {
@@ -172,8 +167,8 @@ class ViewController: UITableViewController {
                 //kUTTypeText informs iOS that the indexed record we're storing is text
         
         //Store favorited tutorial title and subtitle (content)
-        attributeSet.title = tutorial[0]
-        attributeSet.contentDescription = tutorial[1]
+        attributeSet.title = tutorial[0].title
+        attributeSet.contentDescription = tutorial[0].subtitle
         
         //Wrap attributeSet inside CSSearchableItem object
         let item = CSSearchableItem(uniqueIdentifier: "\(item)", domainIdentifier: "com.hackingwithswift", attributeSet: attributeSet)
@@ -203,4 +198,11 @@ class ViewController: UITableViewController {
             }
         }
     }
+    
+    
+ 
+    
+
+    
+    
 }
